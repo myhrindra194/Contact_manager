@@ -54,6 +54,7 @@ mac/
 windows/
 web/
 build/
+macos/
 
 .idea/
 .vscode/

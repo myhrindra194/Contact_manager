@@ -19,7 +19,7 @@ class _ContactViewState extends State<ContactView> {
     String number = _numberController.text;
 
     if (name.isNotEmpty && number.isNotEmpty) {
-      _controller.addContact(name, number as int);
+      _controller.addContact(name, number);
       setState(() {});
       _nameController.clear();
       _numberController.clear();
@@ -28,7 +28,7 @@ class _ContactViewState extends State<ContactView> {
 
   void _updateContact(int index) {
     _nameController.text = _controller.getContacts()[index].name;
-    _numberController.text = _controller.getContacts()[index].number as String;
+    _numberController.text = _controller.getContacts()[index].number;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -51,7 +51,7 @@ class _ContactViewState extends State<ContactView> {
               String name = _nameController.text;
               String number = _numberController.text;
               if (name.isNotEmpty && number.isNotEmpty) {
-                _controller.updateContact(index, name, number as int);
+                _controller.updateContact(index, name, number);
                 setState(() {});
                 Navigator.pop(context);
               }
@@ -99,7 +99,7 @@ class _ContactViewState extends State<ContactView> {
                   final contact = _controller.getContacts()[index];
                   return ListTile(
                     title: Text(contact.name),
-                    subtitle: Text(contact.number as String),
+                    subtitle: Text(contact.number),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
