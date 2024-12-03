@@ -14,6 +14,9 @@ class _ContactViewState extends State<ContactView> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _numberController = TextEditingController();
 
+  bool _isEditing = false;
+  int _editingIndex = -1;
+
   void _addContact() {
     String name = _nameController.text;
     String number = _numberController.text;
@@ -26,41 +29,28 @@ class _ContactViewState extends State<ContactView> {
     }
   }
 
-  void _updateContact(int index) {
-    _nameController.text = _controller.getContacts()[index].name;
-    _numberController.text = _controller.getContacts()[index].number;
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Modifier le contact"),
-        content: Column(
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
-            ),
-            TextField(
-              controller: _numberController,
-              decoration: const InputDecoration(labelText: 'Number'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              String name = _nameController.text;
-              String number = _numberController.text;
-              if (name.isNotEmpty && number.isNotEmpty) {
-                _controller.updateContact(index, name, number);
-                setState(() {});
-                Navigator.pop(context);
-              }
-            },
-            child: const Text("Mettre à jour"),
-          ),
-        ],
-      ),
-    );
+  void _startEditing(int index) {
+    setState(() {
+      _isEditing = true;
+      _editingIndex = index;
+      _nameController.text = _controller.getContacts()[index].name;
+      _numberController.text = _controller.getContacts()[index].number;
+    });
+  }
+
+  void _updateContact() {
+    String name = _nameController.text;
+    String number = _numberController.text;
+
+    if (name.isNotEmpty && number.isNotEmpty) {
+      _controller.updateContact(_editingIndex, name, number);
+      setState(() {
+        _isEditing = false;
+        _editingIndex = -1;
+      });
+      _nameController.clear();
+      _numberController.clear();
+    }
   }
 
   void _deleteContact(int index) {
@@ -72,7 +62,7 @@ class _ContactViewState extends State<ContactView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Gestion des Contacts"),
+        title: const Text("Contact Manager"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -87,10 +77,16 @@ class _ContactViewState extends State<ContactView> {
               decoration: const InputDecoration(labelText: 'Number'),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _addContact,
-              child: const Text("Ajouter un contact"),
-            ),
+            if (_isEditing) // Show "Update" button only when editing
+              ElevatedButton(
+                onPressed: _updateContact,
+                child: const Text("Update"),
+              ),
+            if (!_isEditing)
+              ElevatedButton(
+                onPressed: _addContact,
+                child: const Text("Add Contact"),
+              ),
             const SizedBox(height: 16),
             Expanded(
               child: ListView.builder(
@@ -105,7 +101,7 @@ class _ContactViewState extends State<ContactView> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.edit),
-                          onPressed: () => _updateContact(index),
+                          onPressed: () => _startEditing(index),
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete),
