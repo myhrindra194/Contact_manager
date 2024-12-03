@@ -53,6 +53,14 @@ class _ContactViewState extends State<ContactView> {
     }
   }
 
+  void _cancelUpdate() {
+    setState(() {
+      _isEditing = false;
+      _nameController.clear();
+      _numberController.clear();
+    });
+  }
+
   void _deleteContact(int index) {
     _controller.deleteContact(index);
     setState(() {});
@@ -63,6 +71,8 @@ class _ContactViewState extends State<ContactView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Contact Manager"),
+        leading: const Icon(Icons.phone),
+        backgroundColor: const Color.fromARGB(255, 134, 175, 238),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -75,14 +85,24 @@ class _ContactViewState extends State<ContactView> {
             TextField(
               controller: _numberController,
               decoration: const InputDecoration(labelText: 'Number'),
+              keyboardType: TextInputType.phone,
             ),
             const SizedBox(height: 16),
-            if (_isEditing) // Show "Update" button only when editing
-              ElevatedButton(
-                onPressed: _updateContact,
-                child: const Text("Update"),
-              ),
-            if (!_isEditing)
+            if (_isEditing)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: _cancelUpdate,
+                    child: const Text("Cancel"),
+                  ),
+                  ElevatedButton(
+                    onPressed: _updateContact,
+                    child: const Text("Update"),
+                  ),
+                ],
+              )
+            else
               ElevatedButton(
                 onPressed: _addContact,
                 child: const Text("Add Contact"),
